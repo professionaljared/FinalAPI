@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>API Final</title>
+        <style>
+            /*https://cortex.persona.co/w/1000/q/67/i/738390c3ef570131fed406900ee4fc198d6b04ffaed684ab4c081b212685b251/Terlingua-v5.gif*/
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script>
+            // https://www.openbrewerydb.org/#documentation
+            // https://www.metaweather.com/api/
+            // http://www.tvmaze.com/api
+
+            var moreOpt = false;
+
+            //for the final button to print out the users choice (bar)
+
+            var barController = {
+                queryValue: '',
+                searchingBy: '', 
+                stateSearch: false, 
+                stateOption: ''  
+            };
+
+            //for the final button to print out the users choice (weather)
+
+            var weatherController = {
+                queryValue: '',
+            }
+
+            function maybe(){   
+                var testfunc = document.getElementById('userVal'); 
+                console.log(testfunc.value);
+            }   
+            
+            
+            function apiSelect(){
+                
+                //get the value of the Choose API dropdown and changing the on-screen elements
+                
+                var changing = document.getElementById('apiHolder');
+                var apiOpt = ['Pubs','Weather','Television'];
+                var apiObj = {
+                    pubby : (changing.value === apiOpt[0]),
+                    sunny : (changing.value === apiOpt[1]),
+                    telly : (changing.value === apiOpt[2])    
+                };
+                var apiOpt2 = [apiObj.pubby,apiObj.sunny,apiObj.telly];
+                console.log('pub = ' + apiOpt2[0],'weather = ' + apiOpt2[1],'tel = ' + apiOpt2[2]);
+                
+                //onchange for the API dropdown/ controls what is displayed on the other drops
+                
+                if (apiObj.pubby === true){ //Pub API Change
+                    document.getElementById('userVal').outerHTML='<input placeholder="Open Brewery" id="userVal">';
+                    document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberBar()'><option disabled selected>Choose Amount of Pubs</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
+                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="barApiSelect()"><option disabled selected>Search By:</option><option>City</option><option>State</option><option>Name</option></select>';
+                    document.getElementById('userAdd-on').outerHTML='<button id="userAdd-on" onclick="checkersPub()">Add More Options</button>';
+                    document.getElementById('checkB').innerHTML='';
+                    document.getElementById('userVal2').outerHTML='<input id="userVal2" hidden></input>';
+                    document.getElementById('confirmMain').outerHTML="<button id='confirmMain' onclick='barRun()'>Confirm Selection</button>";
+                    moreOpt = false;
+                }else if (apiObj.sunny === true){ //Weather API change
+                    document.getElementById('userVal').outerHTML='<input placeholder="MetaWeather" id="userVal">';
+                    document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberSun()'><option disabled selected>Choose Amount of Cities</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
+                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="sunApiSelect()"><option disabled selected>Search By:</option><option>City</option></select>';
+                    document.getElementById('userAdd-on').outerHTML='<button id="userAdd-on" onclick="checkersSun()">Add More Options</button>';
+                    document.getElementById('checkB').innerHTML='';
+                    document.getElementById('userVal2').outerHTML='<input id="userVal2" hidden></input>';
+                    document.getElementById('confirmMain').outerHTML="<button id='confirmMain' onclick='sunRun()'>Confirm Selection</button>";
+                    moreOpt = false;
+                }else if (apiObj.telly === true){ //Television API change
+                    document.getElementById('userVal').outerHTML='<input placeholder="TV Maze" id="userVal">';
+                    document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberTelly()'><option disabled selected>Choose Amount of Shows</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
+                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="teleApiSelect"><option disabled selected>Search By:</option><option>Show Name</option></select>';
+                    document.getElementById('userAdd-on').outerHTML='<button id="userAdd-on" onclick="checkersPhone()">Add More Options</button>';
+                    document.getElementById('checkB').innerHTML='';
+                    document.getElementById('userVal2').outerHTML='<input id="userVal2" hidden></input>';
+                    document.getElementById('confirmMain').outerHTML="<button id='confirmMain' onclick='telRun()'>Confirm Selection</button>";
+                    moreOpt = false;
+                }
+                
+                //the key to lock and unlock the console - WIP -
+                
+                var something = document.getElementById('userVal');
+                var masterKey = (something.value === '919293949596979899910');
+                if (masterKey === true){
+                    console.log('Key Accepted');  
+                    document.getElementById('tester').outerHTML="<button id='tester' onclick='maybe()'>Test</button>";    
+                }    
+            }
+            
+            //logs the value for the amount of queries selected 
+            
+            function numberBar(){
+                userNum = document.getElementById('apiSelect').value; 
+                var numberArray = ['1','2','3','4',"I'm Feeling Lucky"];
+                var numberHolder = {
+                    one: (userNum === numberArray[0]),
+                    two: (userNum === numberArray[1]),
+                    three: (userNum === numberArray[2]),
+                    four:(userNum === numberArray[3]),
+                    luckyOpt: (userNum === numberArray[4])
+                };
+                if(numberHolder.one === true){
+                    barController.queryValue = 1;
+                }else if(numberHolder.two === true){
+                    barController.queryValue = 2;            
+                }else if(numberHolder.three === true){
+                    barController.queryValue = 3;        
+                }else if(numberHolder.four === true){
+                    barController.queryValue = 4;        
+                }else if(numberHolder.luckyOpt === true){
+                    barController.queryValue = 'WIP';
+                }   
+                console.log(userNum,numberHolder);
+            }
+
+            function numberSun() {  
+
+            }
+            function numberTelly(){
+
+            }
+
+
+            // changes the options for the user to select for the pub API
+
+            function checkersPub(){
+                moreOpt = true;
+                console.log('moreOpt = ' +moreOpt + ': More options selected by user');
+                document.getElementById('looks').outerHTML='<div id="looks"><br><hr><br></div>';
+                document.getElementById('checkB').outerHTML='<div id="checkB"><form id="brew"><input name="street" value="brew1" type="checkbox">Street Name<input name="city" value="brew2" type="checkbox">City Name<input name="state" value="brew3" type="checkbox">State Name<br><br><input name="country" value="brew4" type="checkbox">Country<input name="longitude" value="brew5" type="checkbox">Longitude<input name="latitude" value="brew6" type="checkbox">Latitude<br><br><input name="phone" value="brew7" type="checkbox">Phone #<input name="website" value="brew8" type="checkbox">Website<input name="brewType" value="brew9" type="checkbox">Brewery Type</form><br><button>Confirm Selection</button></div>';    
+                document.getElementById('confirmMain').style="display:none";
+                document.getElementById('userAdd-on').style="display:none";
+            }
+
+            //changes the options for the user to select for the weather API
+
+            function checkersSun(){
+                moreOpt = true;
+                console.log('moreOpt = ' +moreOpt + ': More options selected by user');
+                document.getElementById('looks').outerHTML='<div id="looks"><br><hr><br></div>';
+                document.getElementById('checkB').outerHTML='<div id="checkB"><form id="temper"><input name="weaStatName" value="temp1" type="checkbox">Weather State<input name="weaStatAbbr" value="temp2" type="checkbox">Weather State Abbreviation<input name="windDir" value="temp3" type="checkbox">Wind Direction Compass<br><br><input name="minTemp" value="temp4" type="checkbox">Minimum Temperature<input name="maxTemp" value="temp5" type="checkbox">Maximum Temp<input name="latitude" value="temp6" type="checkbox">Latitude<br><br><input name="humid" value="temp7" type="checkbox">Humidity<input name="airPress" value="temp8" type="checkbox">Air Pressure<input name="visible" value="temp9" type="checkbox">Visibility</form><br><button>Confirm Selection</button></div>';  
+                document.getElementById('confirmMain').style="display:none";
+                document.getElementById('userAdd-on').style="display:none";
+            }
+            function checkersPhone(){
+                moreOpt = true;
+                console.log('moreOpt = ' +moreOpt + ': More options selected by user');
+                document.getElementById('looks').outerHTML='<div id="looks"><br><hr><br></div>';
+                document.getElementById('checkB').outerHTML='<div id="checkB"><form id="temper"><input name="shwType" value="tel1" type="checkbox">Type of Show<input name="shoStatus" value="tel2" type="checkbox">Show Status<input name="shoStart" value="tel3" type="checkbox">Premiered<br><br><input name="ntwerk" value="tel4" type="checkbox">Network<input name="timing" value="tel5" type="checkbox">Air Time<input name="timeDay" value="tel6" type="checkbox">Day of Showings<br><br><input name="shoAverage" value="tel7" type="checkbox">Average<input name="shoWeight" value="tel8" type="checkbox">Weight<input name="country" value="tel9" type="checkbox">Country</form><br><button>Confirm Selection</button></div>';  
+                document.getElementById('confirmMain').style="display:none";
+                document.getElementById('userAdd-on').style="display:none";       
+            }
+
+            //changes how the page reacts to the searchBy dropdown
+
+            function barApiSelect(){
+                var barOpt=document.getElementById('apiSearch');
+                var barPassthrough = barOpt.value;
+                var barObjMain =['City','State','Name'];
+                var barAPIHolder = {
+                    cityConfirm: (barPassthrough === barObjMain[0]),
+                    stateConfirm: (barPassthrough === barObjMain[1]),
+                    nameConfirm: (barPassthrough === barObjMain[2])
+                };
+                console.log('Bar Search'); 
+                console.log(barAPIHolder, barPassthrough, barObjMain[0]);
+                
+                barController.searchingBy = barPassthrough;
+
+                if(barAPIHolder.stateConfirm === true){
+                    barController.stateSearch = true;
+                    document.getElementById('userVal').outerHTML='<input placeholder="Open Brewery" id="userVal" hidden>';
+                    document.getElementById('userVal2').outerHTML='<select id="userVal2" onchange="stateSelect()"><option disabled selected>States (USA):</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Montana</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select>'
+                }else {
+                    barController.stateSearch = false;
+                    document.getElementById('userVal').outerHTML='<input placeholder="Open Brewery" id="userVal">';
+                    document.getElementById('userVal2').outerHTML='<select id="userVal2" hidden><option disabled selected>States (USA):</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Montana</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select>'    
+
+                } 
+            }
+
+            //the function for the state dropdown
+
+            function stateSelect(){
+                var america = document.getElementById('userVal2').value;
+                var usaStates = ['Alabama','Alaska','Arizona','Arizona','Arizona','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
+                
+                //states equal to the dropdown
+
+                var stateHolder = {
+                    alabamaConfirm :(america === usaStates[0]),
+                    alaskaConfirm : (america === usaStates[1]),
+                    arizonaConfirm : (america === usaStates[2]),
+                    arkansasConfirm : (america === usaStates[3]),
+                    californiaConfirm : (america === usaStates[4]),
+                    coloradoConfirm : (america === usaStates[5]),
+                    connecticutConfirm :(america === usaStates[6]),
+                    delawareConfirm : (america === usaStates[7]),
+                    floridaConfirm : (america === usaStates[8]),
+                    georgiaConfirm : (america === usaStates[9]),
+                    hawaiiConfirm : (america === usaStates[10]),
+                    idahoConfirm : (america === usaStates[11]),
+                    illinoisConfirm : (america === usaStates[12]),
+                    indianaConfirm : (america === usaStates[13]),
+                    iowaConfirm : (america === usaStates[14]),
+                    kansasConfirm : (america === usaStates[15]),
+                    kentuckyConfirm :(america === usaStates[16]),
+                    louisianaConfirm : (america === usaStates[17]),
+                    maineConfirm :(america === usaStates[18]),
+                    marylandConfirm :(america === usaStates[19]),
+                    massachusettsConfirm : (america === usaStates[20]),
+                    michiganConfirm : (america === usaStates[21]),
+                    minnesotaConfirm:  (america === usaStates[22]),
+                    mississippiConfirm:  (america === usaStates[23]),
+                    missouriConfirm:  (america === usaStates[24]),
+                    montanaConfirm:  (america === usaStates[25]),
+                    nebraskaConfirm:  (america === usaStates[26]),
+                    nevadaConfirm:  (america === usaStates[27]),
+                    newhampshireConfirm:  (america === usaStates[28]),
+                    newjerseyConfirm:  (america === usaStates[29]),
+                    newmexicoConfirm: (america === usaStates[30]),
+                    newyorkConfirm:  (america === usaStates[31]),
+                    northcarolinaConfirm:  (america === usaStates[32]),
+                    northdakotaConfirm:  (america === usaStates[33]),
+                    ohioConfirm: (america === usaStates[34]),
+                    oklahomaConfirm: (america === usaStates[35]),
+                    oregonConfirm: (america === usaStates[36]),
+                    pennsylvaniaConfirm:  (america === usaStates[37]),
+                    rhodeislandConfirm:  (america === usaStates[38]),
+                    southcarolinaConfirm:  (america === usaStates[39]),
+                    southdakotaConfirm:  (america === usaStates[40]),
+                    tennesseeConfirm: (america === usaStates[41]),
+                    texasConfirm:  (america === usaStates[42]),
+                    utahConfirm: (america === usaStates[43]),
+                    vermontConfirm: (america === usaStates[44]),
+                    virginiaConfirm:  (america === usaStates[45]),
+                    washingtonConfirm:  (america === usaStates[46]),
+                    westvirginiaConfirm:  (america === usaStates[47]),
+                    wisconsinConfirm :(america === usaStates[48]),
+                    wyomingConfirm:  (america === usaStates[49])
+                };
+                console.log('Using States', america,usaStates[49],stateHolder);
+                if (stateHolder.newhampshireConfirm === true){
+                    barController.stateOption = 'new_hampshire';
+                }else if(stateHolder.newmexicoConfirm === true){
+                    barController.stateOption = 'new_mexico';    
+                }else if(stateHolder.newyorkConfirm === true){
+                    barController.stateOption = 'new_york';
+                }else if(stateHolder.newjerseyConfirm  === true){
+                    barController.stateOption = 'new_jersey';
+                }else if(stateHolder.northcarolinaConfirm  === true){
+                    barController.stateOption = 'north_carolina';    
+                }else if(stateHolder.southcarolinaConfirm  === true){
+                    barController.stateOption = 'south_carolina';    
+                }else if(stateHolder.northdakotaConfirm  === true){
+                    barController.stateOption = 'north_dakota';    
+                }else if(stateHolder.southdakotaConfirm  === true){
+                    barController.stateOption = 'south_dakota';    
+                }else if(stateHolder.westvirginiaConfirm === true){
+                    barController.stateOption = 'west_virginia';    
+                }else if(stateHolder.rhodeislandConfirm === true){
+                    barController.stateOption = 'rhode_island';
+                }else {
+                    barController.stateOption = america;
+                }
+            }
+
+            function sunApiSelect(){
+                
+            }
+            function teleApiSelect(){
+                    
+            }
+
+            //final results and logging
+
+            function barRun(){
+                userSearcher = document.getElementById('userVal').value;
+                console.log('searching by: ' + barController.searchingBy,' --- ','state search: ' + barController.stateSearch,' --- ','query number: '+ barController.queryValue); 
+                console.log(barController);
+                var stateUrl = 'https://api.openbrewerydb.org/breweries?by_state=' + barController.stateOption;
+                var nameUrl = 'https://api.openbrewerydb.org/breweries?by_name=' + userSearcher;
+                var citiesUrl = 'https://api.openbrewerydb.org/breweries?by_city=' + userSearcher;
+                console.log(stateUrl);
+                if(barController.queryValue === ''){
+                    document.getElementById('checkB').innerHTML='<p>Something is Blank.</p>';
+                }else if(barController.searchingBy === 'State'){
+                    console.log('ding3');
+                    $.ajax({
+                        method: "GET",
+                        url: stateUrl
+                    })
+                    .done(function(data) {
+                        var 
+                        name = data.name,
+                        breweryT = data.brewery_type,
+                        street = data.street,
+                        city = data.city,
+                        phone = data.phone;
+                        var i =  0;
+                        for (i = 0; i<barController.queryValue; i++ ){
+                            // document.getElementById('checkB').innerHTML=''
+                            console.log(data[i]);
+                        }  
+                    }) 
+                }else if (userSearcher === ''){
+                    document.getElementById('checkB').innerHTML='<p>Something is Blank.</p>';
+                }else if(barController.searchingBy === 'City'){    
+                    console.log('ding');
+                    $.ajax({
+                        method: "GET",
+                        url: citiesUrl
+                    })
+                    .done(function(data) {
+                        var 
+                        name = data.name,
+                        breweryT = data.brewery_type,
+                        street = data.street,
+                        city = data.city,
+                        phone = data.phone;
+                        var i =  0;
+                        for (i = 0; i<barController.queryValue; i++ ){
+                            // document.getElementById('checkB').innerHTML=''
+                            console.log(data[i]);
+                        }  
+                    })
+                }else if(barController.searchingBy === 'Name'){
+                    console.log('ding2');
+                    $.ajax({
+                        method: "GET",
+                        url: nameUrl
+                    })
+                    .done(function(data) {
+                        var 
+                        name = data.name,
+                        breweryT = data.brewery_type,
+                        street = data.street,
+                        city = data.city,
+                        phone = data.phone;
+                        var i =  0;
+                        for (i = 0; i<barController.queryValue; i++ ){
+                            // document.getElementById('checkB').innerHTML=''
+                            console.log(data[i]);
+                        }  
+                    })  
+                }
+            }
+
+
+            function sunRun(){
+                console.log(1221213213);    
+            }
+            function telRun(){
+                console.log(1223847238947289347892347);    
+            }
+        </script>
+    </head>
+    <body>
+        <h1>The Daily Overview</h1>
+        <hr>
+        <br>
+         <select id='apiHolder' onchange='apiSelect()'>
+            <option selected disabled>Choose an API</option>
+            <option>Pubs</option>
+            <option>Weather</option>
+            <option>Television</option>
+        </select>
+        <br>
+        <br>
+        <div id='next'>
+        <select id='apiSelect'>
+            <option selected disabled>No API Selected</option>
+        </select>
+        <select id='apiSearch'>
+            <option selected disabled>No API Selected</option>    
+        </select>
+        <input id='userVal2' hidden></input> 
+        <input placeholder='No API Selected' id='userVal'>
+        <button id='tester' onclick='maybe()' hidden>Test</button>
+        <button id='confirmMain' hidden>Confirm Selection</button>
+        <button id='userAdd-on' onclick='checkers()' hidden>Add More Options</button>
+        </div>
+        <div id='looks'hidden>
+        <br><hr><br>
+        </div>
+        <div id='checkB'>
+        </div>
+    </body>
+</html>
