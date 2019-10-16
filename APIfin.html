@@ -2,14 +2,54 @@
 <html>
     <head>
         <title>API Final</title>
+        <link href="https://fonts.googleapis.com/css?family=Cinzel|Dosis|Fredoka+One|Open+Sans+Condensed:700&display=swap" rel="stylesheet"> 
         <style>
-            /*https://cortex.persona.co/w/1000/q/67/i/738390c3ef570131fed406900ee4fc198d6b04ffaed684ab4c081b212685b251/Terlingua-v5.gif*/
+            #body{
+                background: linear-gradient(to right, #ece9e6, #ffffff);
+            }
+            #daily{
+                font-family: 'Fredoka One', cursive;
+                font-size:40px;
+            }
+            #barHeaderText{
+                font-family: 'Open Sans Condensed', sans-serif;
+                font-size: 25px;
+            }
+            #weatherHeaderText{
+                font-family: 'Open Sans Condensed', sans-serif;
+            }
+            #showHeaderText{
+                font-family: 'Open Sans Condensed', sans-serif;
+            }
+            #barMark{
+                color:red;
+                font-family: 'Dosis', sans-serif;
+
+            }
+            #error{
+                font-family: 'Cinzel', serif;
+                font-size:18px;
+                color:orange;
+            }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <script>
             // https://www.openbrewerydb.org/#documentation
             // https://www.metaweather.com/api/
             // http://www.tvmaze.com/api
+
+
+            //ON THE TIME OF SUBMISSION, THE IM FEELING LUCKY AND THE MORE OPTIONS BUTTONS DO NOT WORK. WIP 
+
+
+            //getting the current date (stolen off of stack overflow lmao it works though)
+
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();  
+            today = yyyy + '/' + mm + '/' + dd ;
+
 
             var moreOpt = false;
 
@@ -26,6 +66,13 @@
 
             var weatherController = {
                 queryValue: '',
+                searchBy: '',
+                cityCode: ''
+            }
+
+            var televisionController = {
+                queryValue: '',
+                searchBy: '',
             }
 
             function maybe(){   
@@ -61,8 +108,8 @@
                     moreOpt = false;
                 }else if (apiObj.sunny === true){ //Weather API change
                     document.getElementById('userVal').outerHTML='<input placeholder="MetaWeather" id="userVal">';
-                    document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberSun()'><option disabled selected>Choose Amount of Cities</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
-                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="sunApiSelect()"><option disabled selected>Search By:</option><option>City</option></select>';
+                    document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberSun()'><option disabled selected>Choose Amount of Results</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
+                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="sunApiSelectDrop()"><option disabled selected>Search By:</option><option>City</option></select>';
                     document.getElementById('userAdd-on').outerHTML='<button id="userAdd-on" onclick="checkersSun()">Add More Options</button>';
                     document.getElementById('checkB').innerHTML='';
                     document.getElementById('userVal2').outerHTML='<input id="userVal2" hidden></input>';
@@ -71,7 +118,7 @@
                 }else if (apiObj.telly === true){ //Television API change
                     document.getElementById('userVal').outerHTML='<input placeholder="TV Maze" id="userVal">';
                     document.getElementById('apiSelect').outerHTML="<select id='apiSelect' onchange='numberTelly()'><option disabled selected>Choose Amount of Shows</option><option>1</option><option>2</option><option>3</option><option>4</option><option>I'm Feeling Lucky</option></select>";
-                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="teleApiSelect"><option disabled selected>Search By:</option><option>Show Name</option></select>';
+                    document.getElementById('apiSearch').outerHTML ='<select id="apiSearch" onchange="teleApiSelect()"><option disabled selected>Search By:</option><option>Show Name</option></select>';
                     document.getElementById('userAdd-on').outerHTML='<button id="userAdd-on" onclick="checkersPhone()">Add More Options</button>';
                     document.getElementById('checkB').innerHTML='';
                     document.getElementById('userVal2').outerHTML='<input id="userVal2" hidden></input>';
@@ -114,16 +161,56 @@
                 }   
                 console.log(userNum,numberHolder);
             }
-
             function numberSun() {  
-
+                userNum = document.getElementById('apiSelect').value; 
+                var numberArray = ['1','2','3','4',"I'm Feeling Lucky"];
+                var numberHolder = {
+                    one: (userNum === numberArray[0]),
+                    two: (userNum === numberArray[1]),
+                    three: (userNum === numberArray[2]),
+                    four:(userNum === numberArray[3]),
+                    luckyOpt: (userNum === numberArray[4])
+                };
+                if(numberHolder.one === true){
+                    weatherController.queryValue = 1;
+                }else if(numberHolder.two === true){
+                    weatherController.queryValue = 2;            
+                }else if(numberHolder.three === true){
+                    weatherController.queryValue = 3;        
+                }else if(numberHolder.four === true){
+                    weatherController.queryValue = 4;        
+                }else if(numberHolder.luckyOpt === true){
+                    weatherController.queryValue = 'WIP';
+                }   
+                console.log(userNum,numberHolder);        
             }
             function numberTelly(){
-
+                userNum = document.getElementById('apiSelect').value; 
+                var numberArray = ['1','2','3','4',"I'm Feeling Lucky"];
+                var numberHolder = {
+                    one: (userNum === numberArray[0]),
+                    two: (userNum === numberArray[1]),
+                    three: (userNum === numberArray[2]),
+                    four:(userNum === numberArray[3]),
+                    luckyOpt: (userNum === numberArray[4])
+                };
+                if(numberHolder.one === true){
+                    televisionController.queryValue = 1;
+                }else if(numberHolder.two === true){
+                    televisionController.queryValue = 2;            
+                }else if(numberHolder.three === true){
+                    televisionController.queryValue = 3;        
+                }else if(numberHolder.four === true){
+                    televisionController.queryValue = 4;        
+                }else if(numberHolder.luckyOpt === true){
+                    televisionController.queryValue = 'WIP';
+                }   
+                console.log(userNum,numberHolder);        
             }
+            
 
 
-            // changes the options for the user to select for the pub API
+            // changes the options for the user to select for the pub API -WIP-
 
             function checkersPub(){
                 moreOpt = true;
@@ -180,7 +267,18 @@
 
                 } 
             }
-
+            function sunApiSelectDrop(){
+                var sunOpt=document.getElementById('apiSearch');
+                var weatherPassthrough = sunOpt.value;
+                var weatherObjMain = ['City'];
+                var weatherAPIHolder = {
+                    cityConfirm: (weatherPassthrough === weatherObjMain[0]),
+                };
+                console.log('Weather Search'); 
+                console.log(weatherAPIHolder, weatherPassthrough, weatherObjMain[0]);
+                
+                weatherController.searchBy = weatherPassthrough;        
+            }
             //the function for the state dropdown
 
             function stateSelect(){
@@ -267,11 +365,17 @@
                 }
             }
 
-            function sunApiSelect(){
-                
-            }
             function teleApiSelect(){
-                    
+                var tvOpt=document.getElementById('apiSearch');
+                var tvPassthrough = tvOpt.value;
+                var tvObjMain = ['Show Name'];
+                var tvAPIHolder = {
+                    tvConfirm: (tvPassthrough === tvObjMain[0]),
+                };
+                console.log('TV Search'); 
+                console.log(tvAPIHolder, tvPassthrough, tvObjMain[0]);
+                
+                televisionController.searchBy = tvPassthrough;            
             }
 
             //final results and logging
@@ -284,81 +388,154 @@
                 var nameUrl = 'https://api.openbrewerydb.org/breweries?by_name=' + userSearcher;
                 var citiesUrl = 'https://api.openbrewerydb.org/breweries?by_city=' + userSearcher;
                 console.log(stateUrl);
-                if(barController.queryValue === ''){
-                    document.getElementById('checkB').innerHTML='<p>Something is Blank.</p>';
-                }else if(barController.searchingBy === 'State'){
-                    console.log('ding3');
-                    $.ajax({
-                        method: "GET",
-                        url: stateUrl
-                    })
-                    .done(function(data) {
-                        var 
-                        name = data.name,
-                        breweryT = data.brewery_type,
-                        street = data.street,
-                        city = data.city,
-                        phone = data.phone;
-                        var i =  0;
-                        for (i = 0; i<barController.queryValue; i++ ){
-                            // document.getElementById('checkB').innerHTML=''
-                            console.log(data[i]);
-                        }  
-                    }) 
-                }else if (userSearcher === ''){
-                    document.getElementById('checkB').innerHTML='<p>Something is Blank.</p>';
-                }else if(barController.searchingBy === 'City'){    
-                    console.log('ding');
-                    $.ajax({
-                        method: "GET",
-                        url: citiesUrl
-                    })
-                    .done(function(data) {
-                        var 
-                        name = data.name,
-                        breweryT = data.brewery_type,
-                        street = data.street,
-                        city = data.city,
-                        phone = data.phone;
-                        var i =  0;
-                        for (i = 0; i<barController.queryValue; i++ ){
-                            // document.getElementById('checkB').innerHTML=''
-                            console.log(data[i]);
-                        }  
-                    })
-                }else if(barController.searchingBy === 'Name'){
-                    console.log('ding2');
-                    $.ajax({
-                        method: "GET",
-                        url: nameUrl
-                    })
-                    .done(function(data) {
-                        var 
-                        name = data.name,
-                        breweryT = data.brewery_type,
-                        street = data.street,
-                        city = data.city,
-                        phone = data.phone;
-                        var i =  0;
-                        for (i = 0; i<barController.queryValue; i++ ){
-                            // document.getElementById('checkB').innerHTML=''
-                            console.log(data[i]);
-                        }  
-                    })  
+
+                //display depending on the value request of user
+                if (barController.stateSearch === true){
+                    if((barController.queryValue === '') || (barController.stateOption === '')){
+                        document.getElementById('checkB').innerHTML='';
+                        $('#checkB').append('<div><h1 id="error">Value Empty. Check Results</h1></div>');
+                        console.log('val empty');
+                    }else {
+                        $.ajax({
+                            method: "GET",
+                            url: stateUrl
+                        })
+                        .done(function(data) {
+                            document.getElementById('checkB').innerHTML='';
+                            console.log(data);
+                            console.log(stateUrl);
+                            var i =0;
+                            for (i = 0; i<barController.queryValue; i++ ){
+                                // document.getElementById('checkB').innerHTML=''
+                                console.log(data[i]);  
+                                $('#checkB').append('<div><h2 id="barHeaderText">' +data[i].name + '</h2><p id="barText"><em id="barMark">Street:</em> '+ data[i].street +'</p><p id="barText"><em id="barMark">City:</em> ' + data[i].city +'</p><p id="barText"><em id="barMark">State:</em> '+ data[i].state +'</p></div><br>'); 
+                            }  
+                        })
+                    }
+                }else if(barController.searchingBy === ''){
+                        document.getElementById('checkB').innerHTML='';
+                        $('#checkB').append('<div><h1 id="error">Value Empty. Check Results</h1></div>');
+                        console.log('val empty');        
+                }else if(barController.stateSearch === false){
+                    if((barController.queryValue === '') || (userSearcher === '')){
+                        document.getElementById('checkB').innerHTML='';
+                        $('#checkB').append('<div><h1 id="error">Value Empty. Check Results</h1></div>');
+                        console.log('val empty');
+                    }else if(barController.searchingBy === 'City'){
+                        $.ajax({
+                            method: "GET",
+                            url: citiesUrl
+                        })
+                        .done(function(data) {
+                            document.getElementById('checkB').innerHTML='';
+                            console.log(data);
+                            console.log(citiesUrl);
+                            var i =0;
+                            for (i = 0; i<barController.queryValue; i++ ){
+                                // document.getElementById('checkB').innerHTML=''
+                                console.log(data[i]);  
+                                $('#checkB').append('<div><h2 id="barHeaderText">' +data[i].name + '</h2><p id="barText"><em id="barMark">Street:</em> '+ data[i].street +'</p><p id="barText"><em id="barMark">City:</em> ' + data[i].city +'</p><p id="barText"><em id="barMark">State:</em> '+ data[i].state +'</p></div><br>'); 
+                            }  
+                        })
+                    }else if(barController.searchingBy === 'Name'){
+                        $.ajax({
+                            method: "GET",
+                            url: nameUrl
+                        })
+                        .done(function(data) {
+                            document.getElementById('checkB').innerHTML='';
+                            console.log(data);
+                            console.log(citiesUrl);
+                            var i =0;
+                            for (i = 0; i<barController.queryValue; i++ ){
+                                // document.getElementById('checkB').innerHTML=''
+                                console.log(data[i]);  
+                                $('#checkB').append('<div><h2 id="barHeaderText">' +data[i].name + '</h2><p id="barText"><em id="barMark">Street:</em> '+ data[i].street +'</p><p id="barText"><em id="barMark">City:</em> ' + data[i].city +'</p><p id="barText"><em id="barMark">State:</em> '+ data[i].state +'</p></div><br>'); 
+                            }  
+                        })
+                    }
                 }
             }
 
+            //final results for the Weather API
 
             function sunRun(){
-                console.log(1221213213);    
+                console.log('Searching the City Code...'); 
+                userSearcher = document.getElementById('userVal').value; 
+                cityNameUrl = 'https://www.metaweather.com/api/location/search/?query=' + userSearcher;
+                if((weatherController.searchBy ==='')||(weatherController.queryValue ==='')||(userSearcher==='')){
+                    document.getElementById('checkB').innerHTML='';
+                    $('#checkB').append('<div><h1 id="error">Value Empty. Check Results</h1></div>');
+                    console.log('val empty');
+                }else {
+                    $.ajax({
+                        method: "GET",
+                        url: cityNameUrl
+                    })
+                    .done(function(data) {
+                        var cityId = data[0].woeid;
+                        weatherController.cityCode = cityId;
+                        console.log(cityId);
+                        console.log('Logging the city into data...');
+                        cityResults = 'https://www.metaweather.com/api/location/' + cityId + '/' + today;
+                        console.log('Fetching the results...');
+                        console.log(cityResults); 
+                            $.ajax({
+                                method: "GET",
+                                url: cityResults
+                            }) 
+                            .done(function(data){
+                                document.getElementById('checkB').innerHTML='';
+                                var i =0;
+                                for (i = 0; i<weatherController.queryValue; i++ ){
+                                // document.getElementById('checkB').innerHTML=''
+                                console.log(data[i]);  
+                                $('#checkB').append('<div><h2 id="weatherHeaderText">' + userSearcher + ' - Data Created: ' + data[i].created + '</h2><p id="weatherText">Weather State Name: '+ data[i].weather_state_name +'</p><p id="weatherText">Weather State Abbreviation: ' + data[i].weather_state_abbr +'</p><p id="weatherText">Wind Direction Compass: '+ data[i].wind_direction_compass +'</p></div><br>'); 
+                            }
+                            
+                        })
+                    })
+                }
+                 
+                
             }
+            //final results for the Weather API
+
             function telRun(){
-                console.log(1223847238947289347892347);    
+                console.log('Accessing Television API');
+                userSearcher = document.getElementById('userVal').value; 
+                tvNameUrl = 'http://api.tvmaze.com/search/shows?q=' + userSearcher;
+                if((userSearcher === '')||(televisionController.queryValue==='')||(televisionController.searchBy==='')){
+                    document.getElementById('checkB').innerHTML='';
+                    $('#checkB').append('<div><h1 id="error">Value Empty. Check Results</h1></div>');
+                    console.log('val empty');
+                }else {
+                    $.ajax({
+                        method: "GET",
+                        url: tvNameUrl
+                    })
+                    .done(function(data) {
+                        document.getElementById('checkB').innerHTML='';
+                        var 
+                            showName = data[0].show.name,
+                            showGenre = data[0].show.genres;
+                            
+                        console.log(data);
+                        console.log(tvNameUrl);
+                        var i =0;
+                        for (i = 0; i<televisionController.queryValue; i++ ){
+                            // document.getElementById('checkB').innerHTML=''
+                            console.log(data[i]);  
+                            $('#checkB').append('<div><h2 id="showHeaderText">' +data[i].show.name + '</h2><p id="showText">Genre: '+ data[i].show.genres +'</p><p id="showText">Status: ' + data[i].show.status +'</p><p id="showText">Premiered: '+ data[i].show.premiered +'</p></div><br>'); 
+                        }  
+                    })
+                }
+                        
             }
         </script>
     </head>
     <body>
-        <h1>The Daily Overview</h1>
+        <h1 id='daily'>The Daily Overview</h1>
         <hr>
         <br>
          <select id='apiHolder' onchange='apiSelect()'>
